@@ -24,6 +24,7 @@ class ViewContainer(Stack):
     errorIconName = 'dialog-error-symbolic'
     starIconName = 'starred-symbolic'
     countQuery = None
+    filter = None
 
     def __init__(self, title, header_bar, selection_toolbar, useStack=False):
         Stack.__init__(self,
@@ -35,7 +36,7 @@ class ViewContainer(Stack):
         self._adjustmentValueId = 0
         self._adjustmentChangedId = 0
         self._scrollbarVisibleId = 0
-        self._model = Gtk.ListStore(
+        self._model = Gtk.TreeStore(
             GObject.TYPE_STRING,
             GObject.TYPE_STRING,
             GObject.TYPE_STRING,
@@ -52,7 +53,8 @@ class ViewContainer(Stack):
             shadow_type=Gtk.ShadowType.NONE
         )
         self.view.set_view_type(Gd.MainViewType.ICON)
-        self.view.set_model(self._model)
+        self.filter = self._model.filter_new(None)
+        self.view.set_model(self.filter)
         self.selection_toolbar = selection_toolbar
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         box.pack_start(self.view, True, True, 0)
@@ -172,7 +174,7 @@ class ViewContainer(Stack):
         if not item:
             return
         self._offset += 1
-        _iter = self._model.append()
+        _iter = self._model.append(None)
         artist = item.get_string(Grl.METADATA_KEY_ARTIST)\
             or item.get_author()\
             or _("Unknown Artist")
@@ -306,7 +308,7 @@ class Songs(ViewContainer):
         if not item:
             return
         self._offset += 1
-        _iter = self._model.append()
+        _iter = self._model.append(None)
         item.set_title(albumArtCache.get_media_title(item))
         try:
             if item.get_url():
@@ -449,7 +451,7 @@ class Artists (ViewContainer):
     def _populate(self, data=None):
         selection = self.view.get_generic_view().get_selection()
         if not selection.get_selected()[1]:
-            self._allIter = self._model.append()
+            self._allIter = self._model.append(None)
             self._last_selection = self._allIter
             self._artists[_("All Artists").lower()] =\
                 {"iter": self._allIter, "albums": []}
@@ -505,7 +507,7 @@ class Artists (ViewContainer):
         if not artist:
             artist = _("Unknown Artist")
         if not artist.lower() in self._artists:
-            _iter = self._model.append()
+            _iter = self._model.append(None)
             self._artists[artist.lower()] = {"iter": _iter, "albums": []}
             self._model.set(_iter, [2], [artist])
 
