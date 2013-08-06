@@ -1,4 +1,4 @@
-from gi.repository import Gtk, Gio, GLib, Tracker, GObject
+from gi.repository import Gtk, Gio, GLib, Tracker
 from gettext import gettext as _
 
 from gnomemusic.toolbar import Toolbar, ToolbarState
@@ -15,6 +15,7 @@ else:
 
 
 class Window(Gtk.ApplicationWindow):
+
     def __init__(self, app):
         Gtk.ApplicationWindow.__init__(self,
                                        application=app,
@@ -93,7 +94,6 @@ class Window(Gtk.ApplicationWindow):
 
             self.toolbar.set_stack(self._stack)
             self.toolbar.searchbar.show()
-            self.toolbar._search_button.bind_property("active", self.toolbar.searchbar, "search-mode-enabled", GObject.BindingFlags.BIDIRECTIONAL)
 
             self._on_notify_model_id = self._stack.connect("notify::visible-child", self._on_notify_mode)
             self.connect("destroy", self._notify_mode_disconnect)
@@ -112,7 +112,7 @@ class Window(Gtk.ApplicationWindow):
         self.show()
 
     def _on_key_press(self, widget, event):
-        if event.keyval == 102: # Ctrl-f
+        if event.keyval == 102:  # Ctrl-f
             self.toolbar.searchbar.set_property('search-mode-enabled', True)
 
     def _notify_mode_disconnect(self, data=None):
