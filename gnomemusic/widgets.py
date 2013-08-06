@@ -72,7 +72,7 @@ class AlbumWidget(Gtk.EventBox):
 
         self.ui = Gtk.Builder()
         self.ui.add_from_resource('/org/gnome/Music/AlbumWidget.ui')
-        self.model = Gtk.ListStore(
+        self.model = Gtk.TreeStore(
             GObject.TYPE_STRING,  # title
             GObject.TYPE_STRING,
             GObject.TYPE_STRING,
@@ -171,14 +171,14 @@ class AlbumWidget(Gtk.EventBox):
                                self._on_look_up)
 
         # if the active queue has been set by self album,
-        # use it as model, otherwise build the liststore
+        # use it as model, otherwise build the TreeModel
         cached_playlist = self.player.running_playlist("Album", album)
         if cached_playlist:
             self.model = cached_playlist
             self.update_model(self.player, cached_playlist,
                               self.player.currentTrack)
         else:
-            self.model = Gtk.ListStore(GObject.TYPE_STRING,  # title
+            self.model = Gtk.TreeStore(GObject.TYPE_STRING,  # title
                                        GObject.TYPE_STRING,
                                        GObject.TYPE_STRING,
                                        GObject.TYPE_STRING,
@@ -307,7 +307,7 @@ class ArtistAlbums(Gtk.VBox):
         self.ui.get_object("artist").set_label(self.artist)
         self.widgets = []
 
-        self.model = Gtk.ListStore(GObject.TYPE_STRING,   # title
+        self.model = Gtk.TreeStore(GObject.TYPE_STRING,   # title
                                    GObject.TYPE_STRING,
                                    GObject.TYPE_STRING,
                                    GObject.TYPE_BOOLEAN,  # icon shown
