@@ -72,7 +72,7 @@ class AlbumWidget(Gtk.EventBox):
 
         self.ui = Gtk.Builder()
         self.ui.add_from_resource('/org/gnome/Music/AlbumWidget.ui')
-        self.model = Gtk.TreeStore(
+        self.model = Gtk.ListStore(
             GObject.TYPE_STRING,  # title
             GObject.TYPE_STRING,
             GObject.TYPE_STRING,
@@ -178,7 +178,7 @@ class AlbumWidget(Gtk.EventBox):
             self.update_model(self.player, cached_playlist,
                               self.player.currentTrack)
         else:
-            self.model = Gtk.TreeStore(GObject.TYPE_STRING,  # title
+            self.model = Gtk.ListStore(GObject.TYPE_STRING,  # title
                                        GObject.TYPE_STRING,
                                        GObject.TYPE_STRING,
                                        GObject.TYPE_STRING,
@@ -307,7 +307,7 @@ class ArtistAlbums(Gtk.VBox):
         self.ui.get_object("artist").set_label(self.artist)
         self.widgets = []
 
-        self.model = Gtk.TreeStore(GObject.TYPE_STRING,   # title
+        self.model = Gtk.ListStore(GObject.TYPE_STRING,   # title
                                    GObject.TYPE_STRING,
                                    GObject.TYPE_STRING,
                                    GObject.TYPE_BOOLEAN,  # icon shown
