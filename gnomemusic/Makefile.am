@@ -11,5 +11,6 @@ app_PYTHON = \
 	grilo.py \
 	query.py \
 	widgets.py \
-	window.py
+	window.py \
+    playlists.py
 

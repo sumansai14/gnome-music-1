@@ -29,9 +29,12 @@ from gi.repository import Tracker
 from gettext import gettext as _
 from gnomemusic.grilo import grilo
 import logging
+import pdb
 from gnomemusic.query import Query
 from gnomemusic.albumArtCache import AlbumArtCache
+from gnomemusic.playlists import Playlists
 
+playlist = Playlists.get_default()
 tracker = Tracker.SparqlConnection.get(None)
 ALBUM_ART_CACHE = AlbumArtCache.get_default()
 if Gtk.Widget.get_default_direction() is not Gtk.TextDirection.RTL:
@@ -225,6 +228,8 @@ class AlbumWidget(Gtk.EventBox):
             'clicked', self._on_header_cancel_button_clicked)
         self.view.connect('view-selection-changed',
                           self._on_view_selection_changed)
+        selection_toolbar._add_to_playlist_button.connect(
+            'clicked', self._on_add_to_playlist_button_clicked)
         self.view.set_model(self.model)
         escaped_artist = GLib.markup_escape_text(artist)
         escaped_album = GLib.markup_escape_text(album)
@@ -237,6 +242,10 @@ class AlbumWidget(Gtk.EventBox):
             self.ui.get_object('released_label_info').set_text('----')
         self.player.connect('playlist-item-changed', self.update_model)
         #self.emit('loaded')
+
+    def _on_add_to_playlist_button_clicked(self, widget):
+        self.playlists = PlaylistDialog()
+        self.playlists.dialog_box.run()
 
     def _on_view_selection_changed(self, widget):
         items = self.view.get_selection()
@@ -415,6 +424,61 @@ class ArtistAlbums(Gtk.VBox):
             song_widget.title.set_markup('<span>%s</span>' % escapedTitle)
             itr = self.model.iter_next(itr)
         return False
+
+
+class PlaylistDialog():
+    def __init__(self):
+        self.ui = Gtk.Builder()
+        self.ui.add_from_resource('/org/gnome/Music/PlaylistDialog.ui')
+        self.dialog_box = self.ui.get_object('dialog1')
+        self.dialog_box.set_default_size(300, 500)
+        self._cancel_button = self.ui.get_object('cancel-button')
+        self._select_button = self.ui.get_object('select-button')
+        self.view = Gtk.TreeView()
+        self.model = Gtk.ListStore(str)
+        playlist_names = playlist.get_playlists()
+        self.populate(playlist_names)
+        self.view.set_model(self.model)
+        self.title_bar = self.ui.get_object('headerbar1')
+        self.dialog_box.set_titlebar(self.title_bar)
+        box = self.dialog_box.get_content_area()
+        self._add_list_renderers()
+        box.add(self.view)
+        self.view.connect('row-activated', self._on_item_activated)
+        self._cancel_button.connect('clicked', self._on_cancel_button_clicked)
+        self._select_button.connect('clicked', self._on_selection)
+        self.dialog_box.show_all()
+
+    def _add_list_renderers(self):
+        cols = Gtk.TreeViewColumn()
+        type_renderer = Gd.StyledTextRenderer(
+            xpad=16,
+            ypad=16,
+            ellipsize=Pango.EllipsizeMode.END,
+            xalign=0.0,
+            width=220
+        )
+        # self.view.add_renderer(type_renderer, lambda *args: None, None)
+        cols.clear_attributes(type_renderer)
+        cols.add_attribute(type_renderer, "text", 0)
+        self.view.append_column(cols)
+
+    def populate(self, items):
+        for playlist_name in items:
+            self.model.append([playlist_name])
+            # self.model.set(_iter, [0], )
+            # pdb.set_trace()
+        add_playlist_iter = self.model.append()
+        self.model.set(add_playlist_iter, [0], [_("New Playlist")])
+
+    def _on_selection(self, select_button):
+        pass
+
+    def _on_cancel_button_clicked(self, cancel_button):
+        self.dialog_box.destroy()
+
+    def _on_item_activated(self, widget, item_id, path):
+        pass
 
 
 class AllArtistsAlbums(ArtistAlbums):
