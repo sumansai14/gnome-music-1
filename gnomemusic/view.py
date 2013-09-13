@@ -161,6 +161,7 @@ class ViewContainer(Stack):
             self.header_bar.set_selection_mode(True)
             self.selection_toolbar.eventbox.set_visible(True)
             self.selection_toolbar._add_to_playlist_button.set_sensitive(False)
+            self.selection_toolbar._remove_from_playlist_button.set_sensitive(False)
         else:
             self.view.set_selection_mode(False)
             self.header_bar.set_selection_mode(False)
@@ -183,8 +184,10 @@ class ViewContainer(Stack):
 
     def _on_view_selection_changed(self, widget):
         items = self.view.get_selection()
-        self.selection_toolbar\
-            ._add_to_playlist_button.set_sensitive(len(items) > 0)
+        self.selection_toolbar._add_to_playlist_button.\
+            set_sensitive(len(items) > 0)
+        self.selection_toolbar._remove_from_playlist_button.\
+            set_sensitive(len(items) > 0)
 
     def _populate(self, data=None):
         self._init = True
